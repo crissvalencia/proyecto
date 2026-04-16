@@ -1,0 +1,57 @@
+{% extends "gestion/base.html" %}
+{% block title %}Empleados - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-users"></i></span> Empleados</h1>
+    <a href="{% url 'empleado_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo Empleado</a>
+</div>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th>Puesto</th>
+                <th>Telefono</th>
+                <th>Salario</th>
+                <th>Registro</th>
+                <th>Última Act.</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in empleados %}
+            <tr>
+                <td>{{ e.cedula }}</td>
+                <td>{{ e.nombre }}</td>
+                <td>{{ e.get_puesto_display }}</td>
+                <td>{{ e.telefono }}</td>
+                <td>${{ e.salario }}</td>
+                <td style="font-size: 0.85em; color: var(--text-muted);">{{ e.fecha_registro|date:"d/m/Y H:i" }}</td>
+                <td style="font-size: 0.85em; color: var(--text-muted);">{{ e.fecha_actualizacion|date:"d/m/Y H:i" }}</td>
+                <td>
+                    {% if e.activo %}
+                    <span class="badge badge-confirmada">Activo</span>
+                    {% else %}
+                    <span class="badge badge-cancelada">Inactivo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'empleado_update' e.pk %}" class="btn btn-warning btn-sm"><i
+                                class="fas fa-edit"></i></a>
+                        <a href="{% url 'empleado_delete' e.pk %}" class="btn btn-danger btn-sm"><i
+                                class="fas fa-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" style="text-align:center; color: var(--text-muted);">No hay empleados registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

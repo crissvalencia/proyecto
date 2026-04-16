@@ -1,0 +1,28 @@
+{% extends "gestion/base.html" %}
+{% block title %}{{ titulo }} - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-box"></i></span> {{ titulo }}</h1>
+    <a href="{% url 'producto_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+</div>
+<div class="form-container">
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<small style="color: var(--danger);">{{ field.errors.0 }}</small>{% endif %}
+                </div>
+                {% endfor %}
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Guardar</button>
+                    <a href="{% url 'producto_list' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

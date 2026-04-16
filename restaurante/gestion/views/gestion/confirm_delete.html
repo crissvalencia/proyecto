@@ -1,0 +1,25 @@
+{% extends "gestion/base.html" %}
+{% block title %}Eliminar {{ tipo }} - RestaurantPro{% endblock %}
+{% block content %}
+<div class="delete-container">
+    <div class="card">
+        <div class="card-body" style="padding: 40px;">
+            <div class="icon-warning"><i class="fas fa-exclamation-triangle"></i></div>
+            <h2 style="margin-bottom: 16px;">Confirmar Eliminacion</h2>
+            <p style="color: var(--text-muted); margin-bottom: 24px;">
+                Esta seguro de que desea eliminar el {{ tipo }}: <strong style="color: #fff;">{{ objeto }}</strong>?
+            </p>
+            <p style="color: var(--danger); font-size: 0.85rem; margin-bottom: 24px;">
+                <i class="fas fa-info-circle"></i> Esta accion no se puede deshacer.
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
+                    <a href="{% url cancel_url %}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

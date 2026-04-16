@@ -1,0 +1,45 @@
+{% extends "gestion/base.html" %}
+{% block title %}Clientes - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-user-tie"></i></span> Clientes</h1>
+    <a href="{% url 'cliente_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo Cliente</a>
+</div>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th>Telefono</th>
+                <th>Email</th>
+                <th>Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in clientes %}
+            <tr>
+                <td>{{ c.cedula }}</td>
+                <td>{{ c.nombre }}</td>
+                <td>{{ c.telefono|default:"-" }}</td>
+                <td>{{ c.email|default:"-" }}</td>
+                <td>{{ c.fecha_registro|date:"d/m/Y" }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'cliente_update' c.pk %}" class="btn btn-warning btn-sm"><i
+                                class="fas fa-edit"></i></a>
+                        <a href="{% url 'cliente_delete' c.pk %}" class="btn btn-danger btn-sm"><i
+                                class="fas fa-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align:center; color: var(--text-muted);">No hay clientes registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "gestion/base.html" %}
+{% block title %}Reservas - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-calendar-check"></i></span> Reservas</h1>
+    <a href="{% url 'reserva_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nueva Reserva</a>
+</div>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Mesa</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Personas</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reservas %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.cliente.nombre }}</td>
+                <td>Mesa {{ r.mesa.numero }}</td>
+                <td>{{ r.fecha|date:"d/m/Y" }}</td>
+                <td>{{ r.hora|time:"H:i" }}</td>
+                <td>{{ r.num_personas }}</td>
+                <td><span class="badge badge-{{ r.estado }}">{{ r.get_estado_display }}</span></td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'reserva_update' r.pk %}" class="btn btn-warning btn-sm"><i
+                                class="fas fa-edit"></i></a>
+                        <a href="{% url 'reserva_delete' r.pk %}" class="btn btn-danger btn-sm"><i
+                                class="fas fa-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align:center; color: var(--text-muted);">No hay reservas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

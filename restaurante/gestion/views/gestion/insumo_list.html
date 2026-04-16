@@ -1,0 +1,47 @@
+{% extends "gestion/base.html" %}
+{% block title %}Inventario Insumos - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-boxes"></i></span> Inventario de Insumos</h1>
+    <a href="{% url 'insumo_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo Insumo</a>
+</div>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Stock Actual</th>
+                <th>Stock Minimo</th>
+                <th>Actualizado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for insumo in insumos %}
+            <tr>
+                <td><strong>{{ insumo.nombre }}</strong></td>
+                <td>
+                    {% if insumo.cantidad <= insumo.stock_minimo %}
+                        <span style="color: var(--danger); font-weight: 700;">{{ insumo.cantidad }} {{ insumo.unidad_medida }}</span>
+                    {% else %}
+                        <span style="color: var(--success); font-weight: 700;">{{ insumo.cantidad }} {{ insumo.unidad_medida }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ insumo.stock_minimo }} {{ insumo.unidad_medida }}</td>
+                <td>{{ insumo.fecha_actualizacion|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'insumo_update' insumo.pk %}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+                        <a href="{% url 'insumo_delete' insumo.pk %}" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center; color: var(--text-muted);">No hay insumos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

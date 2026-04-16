@@ -1,0 +1,41 @@
+{% extends "gestion/base.html" %}
+{% block title %}Categorías - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-tags"></i></span> Categorías de Productos</h1>
+    <a href="{% url 'categoria_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nueva Categoría</a>
+</div>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Productos</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in categorias %}
+            <tr>
+                <td><strong>{{ c.nombre }}</strong></td>
+                <td>{{ c.descripcion|truncatewords:8|default:"-" }}</td>
+                <td>{{ c.productos.count }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'categoria_update' c.pk %}" class="btn btn-warning btn-sm"><i
+                                class="fas fa-edit"></i></a>
+                        <a href="{% url 'categoria_delete' c.pk %}" class="btn btn-danger btn-sm"><i
+                                class="fas fa-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align:center; color: var(--text-muted);">No hay categorías registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

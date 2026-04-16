@@ -1,0 +1,49 @@
+{% extends "gestion/base.html" %}
+{% block title %}Mesas - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-chair"></i></span> Mesas</h1>
+    <a href="{% url 'mesa_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nueva Mesa</a>
+</div>
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Numero</th>
+                <th>Capacidad</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in mesas %}
+            <tr>
+                <td><strong>Mesa {{ m.numero }}</strong></td>
+                <td>{{ m.capacidad }} personas</td>
+                <td>
+                    {% if not m.disponible %}
+                    <span class="badge badge-cancelada">Ocupada</span>
+                    {% elif m.has_reservation_today %}
+                    <span class="badge" style="background-color: #0d6efd; color: white;">Reservada Hoy</span>
+                    {% else %}
+                    <span class="badge badge-confirmada">Disponible</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'mesa_update' m.pk %}" class="btn btn-warning btn-sm"><i
+                                class="fas fa-edit"></i></a>
+                        <a href="{% url 'mesa_delete' m.pk %}" class="btn btn-danger btn-sm"><i
+                                class="fas fa-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align:center; color: var(--text-muted);">No hay mesas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

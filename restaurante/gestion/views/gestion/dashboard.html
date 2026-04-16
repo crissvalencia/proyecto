@@ -1,0 +1,115 @@
+{% extends "gestion/base.html" %}
+{% block title %}Dashboard - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-chart-pie"></i></span> Dashboard</h1>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <a href="{% url 'empleado_list' %}" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-number">{{ total_empleados }}</div>
+            <div class="stat-label">Empleados Activos</div>
+        </div>
+    </a>
+    <a href="{% url 'producto_list' %}" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="stat-icon"><i class="fas fa-boxes-stacked"></i></div>
+            <div class="stat-number">{{ total_productos }}</div>
+            <div class="stat-label">Productos</div>
+        </div>
+    </a>
+    <a href="{% url 'orden_list' %}" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+            <div class="stat-number">{{ total_ordenes }}</div>
+            <div class="stat-label">Ordenes Activas</div>
+        </div>
+    </a>
+    <a href="{% url 'reserva_list' %}" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="stat-number">{{ total_reservas }}</div>
+            <div class="stat-label">Reservas Confirmadas</div>
+        </div>
+    </a>
+    <a href="{% url 'cliente_list' %}" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+            <div class="stat-number">{{ total_clientes }}</div>
+            <div class="stat-label">Clientes</div>
+        </div>
+    </a>
+    <a href="{% url 'mesa_list' %}" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="stat-icon"><i class="fas fa-chair"></i></div>
+            <div class="stat-number">{{ total_mesas }}</div>
+            <div class="stat-label">Mesas</div>
+        </div>
+    </a>
+</div>
+
+<!-- Ordenes recientes y productos bajo stock -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <div class="card">
+        <div class="card-header"><i class="fas fa-clock"></i> Ordenes Recientes</div>
+        <div class="card-body">
+            {% if ordenes_recientes %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Mesa</th>
+                        <th>Estado</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orden in ordenes_recientes %}
+                    <tr>
+                        <td><a href="{% url 'orden_detail' orden.pk %}">{{ orden.id }}</a></td>
+                        <td>Mesa {{ orden.mesa.numero }}</td>
+                        <td><span class="badge badge-{{ orden.estado }}">{{ orden.get_estado_display }}</span></td>
+                        <td>${{ orden.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: var(--text-muted);">No hay ordenes recientes.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> Insumos
+            Bajo Stock</div>
+        <div class="card-body">
+            {% if insumos_bajo_stock %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Insumo</th>
+                        <th>Stock Actual</th>
+                        <th>Minimo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for insumo in insumos_bajo_stock %}
+                    <tr>
+                        <td>{{ insumo.nombre }}</td>
+                        <td><span style="color: var(--danger); font-weight: 700;">{{ insumo.cantidad }} {{ insumo.unidad_medida }}</span></td>
+                        <td>{{ insumo.stock_minimo }} {{ insumo.unidad_medida }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: var(--text-muted);">Todos los insumos tienen stock suficiente.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

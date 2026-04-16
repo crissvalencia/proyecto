@@ -1,0 +1,85 @@
+{% extends "gestion/base.html" %}
+{% block title %}Reporte de Ventas - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-chart-bar"></i></span> Reporte de Ventas por Semestre</h1>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+    <!-- Semestre actual -->
+    <div class="table-container">
+        <h2 style="padding: 16px;">{{ nombre_actual }}</h2>
+        <table class="table">
+            <tr>
+                <td><strong>Total ventas</strong></td>
+                <td>${{ semestre_actual.total_ventas }}</td>
+            </tr>
+            <tr>
+                <td><strong>Órdenes entregadas</strong></td>
+                <td>{{ semestre_actual.total_ordenes }}</td>
+            </tr>
+        </table>
+        <h3 style="padding: 0 16px;">Top 3 productos</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Unidades vendidas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in semestre_actual.top_productos %}
+                <tr>
+                    <td>{{ p.producto__nombre }}</td>
+                    <td>{{ p.total_vendido }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" style="text-align:center; color: var(--text-muted);">Sin ventas en este período.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Semestre anterior -->
+    <div class="table-container">
+        <h2 style="padding: 16px;">{{ nombre_anterior }}</h2>
+        <table class="table">
+            <tr>
+                <td><strong>Total ventas</strong></td>
+                <td>${{ semestre_anterior.total_ventas }}</td>
+            </tr>
+            <tr>
+                <td><strong>Órdenes entregadas</strong></td>
+                <td>{{ semestre_anterior.total_ordenes }}</td>
+            </tr>
+        </table>
+        <h3 style="padding: 0 16px;">Top 3 productos</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Unidades vendidas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in semestre_anterior.top_productos %}
+                <tr>
+                    <td>{{ p.producto__nombre }}</td>
+                    <td>{{ p.total_vendido }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" style="text-align:center; color: var(--text-muted);">Sin ventas en este período.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "gestion/base.html" %}
+{% block title %}Factura {{ factura.numero_factura }} - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header no-print">
+    <h1><span class="icon"><i class="fas fa-file-invoice-dollar"></i></span> {{ factura.numero_factura }}</h1>
+    <div>
+        <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-print"></i> Imprimir</button>
+        <a href="{% url 'factura_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+    </div>
+</div>
+
+<div class="factura-print">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="margin-bottom: 4px;">RestaurantPro</h2>
+        <p style="color: #666;">Sistema de Gestion de Restaurante</p>
+        <hr style="margin: 16px 0; border-color: #eee;">
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+        <div>
+            <h3 style="margin-bottom: 8px;">Factura</h3>
+            <p><strong>No:</strong> {{ factura.numero_factura }}</p>
+            <p><strong>Fecha:</strong> {{ factura.fecha|date:"d/m/Y H:i" }}</p>
+            <p><strong>Orden:</strong> #{{ factura.orden.id }}</p>
+        </div>
+        <div style="text-align: right;">
+            <h3 style="margin-bottom: 8px;">Cliente</h3>
+            <p>{{ factura.cliente.nombre }}</p>
+            <p>{{ factura.cliente.telefono|default:"" }}</p>
+            <p>{{ factura.cliente.email|default:"" }}</p>
+        </div>
+    </div>
+
+    <p style="margin-bottom: 8px;"><strong>Atendido por:</strong> {{ factura.empleado.nombre }}</p>
+
+    <table style="margin-top: 16px;">
+        <thead>
+            <tr>
+                <th style="text-align:left;">Producto</th>
+                <th>Cantidad</th>
+                <th>P. Unitario</th>
+                <th style="text-align:right;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in detalles %}
+            <tr>
+                <td>{{ d.producto.nombre }}</td>
+                <td style="text-align:center;">{{ d.cantidad }}</td>
+                <td style="text-align:center;">${{ d.precio_unitario }}</td>
+                <td style="text-align:right;">${{ d.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="text-align: right; margin-top: 24px; padding-top: 16px; border-top: 2px solid #333;">
+        <p style="font-size: 1rem;"><strong>Subtotal:</strong> ${{ factura.subtotal }}</p>
+        <p style="font-size: 1rem;"><strong>Impuesto:</strong> ${{ factura.impuesto }}</p>
+        <p style="font-size: 1.4rem; color: #2e7d32; margin-top: 8px;"><strong>TOTAL: ${{ factura.total }}</strong></p>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; color: #999; font-size: 0.85rem;">
+        <p>Gracias por su visita</p>
+        <p>RestaurantPro - Sistema de Gestion</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "gestion/base.html" %}
+{% block title %}{{ titulo }} - RestaurantPro{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-clipboard-list"></i></span> {{ titulo }}</h1>
+    <a href="{% url 'orden_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+</div>
+
+<form method="post" id="pedido-form">
+    {% csrf_token %}
+    <input type="hidden" name="productos_json" id="productos_json">
+    <div id="js-alert-container"></div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- INFO BASICA DEL PEDIDO -->
+        <div class="card">
+            <div class="card-header"><i class="fas fa-info-circle"></i> Detalles Generales</div>
+            <div class="card-body">
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<small style="color: var(--danger);">{{ field.errors.0 }}</small>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- PRODUCTOS DEL PEDIDO -->
+        <div class="card">
+            <div class="card-header"><i class="fas fa-list"></i> Productos del Pedido</div>
+            <div class="card-body">
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <select id="producto-select" class="form-select" style="flex: 2;">
+                        <option value="">-- Seleccionar Producto --</option>
+                        {% for p in productos %}
+                        <option value="{{ p.id }}" data-nombre="{{ p.nombre }}" data-precio="{{ p.precio }}">{{ p.nombre }} - ${{ p.precio }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" id="producto-cantidad" class="form-control" placeholder="Cant." min="1" value="1" style="flex: 1;">
+                    <button type="button" class="btn btn-primary" onclick="agregarProductoList()"><i class="fas fa-plus"></i></button>
+                </div>
+
+                <table class="table" id="productos-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cant.</th>
+                            <th>Subtotal</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="empty-row">
+                            <td colspan="4" style="text-align:center; color: var(--text-muted);">No hay productos agregados todavía.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 24px; text-align: right;">
+        <button type="button" class="btn btn-success" onclick="submitPedido()"><i class="fas fa-save"></i> Crear Pedido Completo</button>
+        <a href="{% url 'orden_list' %}" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+<script>
+    let productosPedido = [];
+
+    function mostrarAlerta(mensaje, tipo) {
+        const container = document.getElementById('js-alert-container');
+        container.innerHTML = `
+            <div class="alert alert-${tipo}" style="margin-bottom: 20px;">
+                <i class="fas fa-exclamation-triangle"></i> ${mensaje}
+            </div>
+        `;
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 5000);
+    }
+
+    function agregarProductoList() {
+        const select = document.getElementById('producto-select');
+        const cantidadInput = document.getElementById('producto-cantidad');
+        
+        const id = select.value;
+        const cantidad = parseInt(cantidadInput.value);
+
+        if (!id || isNaN(cantidad) || cantidad <= 0) {
+            mostrarAlerta('Por favor selecciona un producto e ingresa una cantidad válida.', 'warning');
+            return;
+        }
+
+        const option = select.options[select.selectedIndex];
+        const nombre = option.getAttribute('data-nombre');
+        const precio = parseFloat(option.getAttribute('data-precio'));
+        const subtotal = precio * cantidad;
+
+        // Check if already in list
+        const existingIndex = productosPedido.findIndex(p => p.id === id);
+        if (existingIndex >= 0) {
+            productosPedido[existingIndex].cantidad += cantidad;
+            productosPedido[existingIndex].subtotal += subtotal;
+        } else {
+            productosPedido.push({ id, nombre, cantidad, precio, subtotal });
+        }
+
+        renderTabla();
+        
+        // Reset inputs
+        select.value = '';
+        cantidadInput.value = 1;
+    }
+
+    function removerProducto(id) {
+        productosPedido = productosPedido.filter(p => p.id !== id);
+        renderTabla();
+    }
+
+    function renderTabla() {
+        const tbody = document.querySelector('#productos-table tbody');
+        tbody.innerHTML = '';
+
+        if (productosPedido.length === 0) {
+            tbody.innerHTML = `<tr id="empty-row"><td colspan="4" style="text-align:center; color: var(--text-muted);">No hay productos agregados todavía.</td></tr>`;
+            return;
+        }
+
+        productosPedido.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${p.nombre}</td>
+                <td>${p.cantidad}</td>
+                <td>$${p.subtotal.toFixed(2)}</td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="removerProducto('${p.id}')"><i class="fas fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function submitPedido() {
+        if (productosPedido.length === 0) {
+            mostrarAlerta('Debe agregar al menos un producto al pedido.', 'danger');
+            return;
+        }
+        document.getElementById('productos_json').value = JSON.stringify(productosPedido);
+        document.getElementById('pedido-form').submit();
+    }
+</script>
+{% endblock %}
