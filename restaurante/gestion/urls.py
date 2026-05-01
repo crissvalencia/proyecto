@@ -10,14 +10,22 @@ from .controllers import (
     orden_list, orden_create, orden_detail, orden_agregar_detalle, orden_cambiar_estado, orden_delete,
     factura_list, factura_detail,
     insumo_list, insumo_create, insumo_update, insumo_delete,
-    reporte_ventas,
+    reporte_ventas, reporte_meseros,
     crear_usuario_view, usuario_list_view,
+    receta_list, receta_create, receta_update, receta_delete,
+    empresa_list, empresa_create, empresa_update, empresa_delete,
+    sucursal_list, sucursal_create, sucursal_update, sucursal_delete,
 )
 from django.contrib.auth.views import LoginView, LogoutView
+from .controllers.auth_controller import recuperar_clave_view
 
 urlpatterns = [
     path('login/', LoginView.as_view(template_name='gestion/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    
+    # Recuperación de contraseña directa (Autenticación POS)
+    path('recuperar-acceso/', recuperar_clave_view, name='recuperar_clave'),
+
     path('', dashboard, name='dashboard'),
     # Empleados (RF001)
     path('empleados/', empleado_list, name='empleado_list'),
@@ -66,7 +74,23 @@ urlpatterns = [
     path('insumos/<int:pk>/eliminar/', insumo_delete, name='insumo_delete'),
     # Reportes (RF012)
     path('reportes/ventas/', reporte_ventas, name='reporte_ventas'),
+    path('reportes/meseros/', reporte_meseros, name='reporte_meseros'),
+    # Recetas
+    path('recetas/', receta_list, name='receta_list'),
+    path('recetas/crear/', receta_create, name='receta_create'),
+    path('recetas/<int:pk>/editar/', receta_update, name='receta_update'),
+    path('recetas/<int:pk>/eliminar/', receta_delete, name='receta_delete'),
     # Usuarios (Auth)
     path('usuarios/', usuario_list_view, name='usuario_list'),
     path('usuarios/crear/', crear_usuario_view, name='crear_usuario'),
+    # Empresa y Sucursal
+    path('empresa/', empresa_list, name='empresa_list'),
+    path('empresa/crear/', empresa_create, name='empresa_create'),
+    path('empresa/<int:pk>/editar/', empresa_update, name='empresa_update'),
+    path('empresa/<int:pk>/eliminar/', empresa_delete, name='empresa_delete'),
+    
+    path('empresa/<int:empresa_id>/sucursales/', sucursal_list, name='sucursal_list'),
+    path('empresa/<int:empresa_id>/sucursales/crear/', sucursal_create, name='sucursal_create'),
+    path('empresa/<int:empresa_id>/sucursales/<int:pk>/editar/', sucursal_update, name='sucursal_update'),
+    path('empresa/<int:empresa_id>/sucursales/<int:pk>/eliminar/', sucursal_delete, name='sucursal_delete'),
 ]

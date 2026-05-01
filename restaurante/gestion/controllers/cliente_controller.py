@@ -1,14 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.db.models import Q
 from gestion.models import Cliente
 from gestion.helpers.forms import ClienteForm
+from gestion.helpers.decorators import cajero_or_admin_required, admin_required
 
 
+@cajero_or_admin_required
 def cliente_list(request):
-    clientes = Cliente.objects.all()
-    return render(request, 'gestion/cliente_list.html', {'clientes': clientes})
+    # RF0011 — buscar por nombre
+    nombre = request.GET.get('nombre', '').strip()
+    clientes = Cliente.objects.filter(nombre__icontains=nombre) if nombre else Cliente.objects.all()
+
+    return render(request, 'gestion/cliente_list.html', {
+        'clientes': clientes,
+        'nombre_actual': nombre,
+    })
 
 
+@cajero_or_admin_required
 def cliente_create(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
@@ -21,6 +31,7 @@ def cliente_create(request):
     return render(request, 'gestion/cliente_form.html', {'form': form, 'titulo': 'Registrar Cliente'})
 
 
+@cajero_or_admin_required
 def cliente_update(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     if request.method == 'POST':
@@ -34,13 +45,13 @@ def cliente_update(request, pk):
     return render(request, 'gestion/cliente_form.html', {'form': form, 'titulo': 'Editar Cliente'})
 
 
+@admin_required
 def cliente_delete(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     if request.method == 'POST':
         if cliente.facturas.exists() or cliente.ordenes.exists():
-            messages.error(request, 'No se puede eliminar el cliente porque tiene registros asociados (facturas u órdenes).')
+            messages.error(request, 'No se puede eliminar el cliente porque tiene registros asociados.')
             return redirect('cliente_list')
-            
         cliente.delete()
         messages.success(request, 'Cliente eliminado exitosamente.')
         return redirect('cliente_list')

@@ -5,12 +5,45 @@
     <h1><span class="icon"><i class="fas fa-users"></i></span> Empleados</h1>
     <a href="{% url 'empleado_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo Empleado</a>
 </div>
+
+<div class="card" style="margin-bottom: 20px; padding: 15px;">
+    <form method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <label for="q" style="font-weight: bold; margin-bottom: 5px; display: block;">Buscar</label>
+            <input type="text" name="q" id="q" value="{{ filtro_q }}" class="form-control" placeholder="Nombre o apellido...">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <label for="puesto" style="font-weight: bold; margin-bottom: 5px; display: block;">Puesto</label>
+            <select name="puesto" id="puesto" class="form-control">
+                <option value="">Todos</option>
+                {% for value, label in puestos %}
+                <option value="{{ value }}" {% if value == filtro_puesto %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <label for="activo" style="font-weight: bold; margin-bottom: 5px; display: block;">Estado</label>
+            <select name="activo" id="activo" class="form-control">
+                <option value="">Todos</option>
+                <option value="1" {% if filtro_activo == "1" %}selected{% endif %}>Activos</option>
+                <option value="0" {% if filtro_activo == "0" %}selected{% endif %}>Inactivos</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filtrar</button>
+            <a href="{% url 'empleado_list' %}" class="btn btn-secondary"><i class="fas fa-eraser"></i> Limpiar</a>
+        </div>
+    </form>
+</div>
+
 <div class="table-container">
     <table class="table">
         <thead>
             <tr>
-                <th>Cédula</th>
-                <th>Nombre</th>
+                <th>Tipo Doc.</th>
+                <th>Número Documento</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
                 <th>Puesto</th>
                 <th>Telefono</th>
                 <th>Salario</th>
@@ -23,8 +56,10 @@
         <tbody>
             {% for e in empleados %}
             <tr>
-                <td>{{ e.cedula }}</td>
+                <td>{{ e.get_tipo_documento_display }}</td>
+                <td>{{ e.numero_documento }}</td>
                 <td>{{ e.nombre }}</td>
+                <td>{{ e.apellido }}</td>
                 <td>{{ e.get_puesto_display }}</td>
                 <td>{{ e.telefono }}</td>
                 <td>${{ e.salario }}</td>
@@ -48,7 +83,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9" style="text-align:center; color: var(--text-muted);">No hay empleados registrados.</td>
+                <td colspan="11" style="text-align:center; color: var(--text-muted);">No hay empleados registrados.</td>
             </tr>
             {% endfor %}
         </tbody>

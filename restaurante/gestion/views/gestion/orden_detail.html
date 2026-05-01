@@ -23,7 +23,7 @@
                     </div>
                     <div>
                         <p style="color: var(--text-muted); font-size: 0.8rem;">Mesero</p>
-                        <p><strong>{{ orden.mesero.nombre }}</strong></p>
+                        <p><strong>{{ orden.mesero.nombre }} {{ orden.mesero.apellido }}</strong></p>
                     </div>
                     <div>
                         <p style="color: var(--text-muted); font-size: 0.8rem;">Estado</p>
@@ -92,7 +92,14 @@
                     <div class="form-group">
                         {{ estado_form.estado }}
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-sync"></i>
+
+                    <!-- Div oculto por defecto que se muestra si el estado es 'pagada' -->
+                    <div class="form-group" id="contenedor-metodo-pago" style="display: none; margin-top: 15px;">
+                        <label for="{{ pago_form.metodo_pago.id_for_label }}">Método de Pago para Factura:</label>
+                        {{ pago_form.metodo_pago }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 15px;"><i class="fas fa-sync"></i>
                         Actualizar Estado</button>
                 </form>
                 <small style="color: var(--text-muted); display: block; margin-top: 8px;">
@@ -102,7 +109,7 @@
         </div>
 
         <!-- Agregar producto -->
-        {% if orden.estado != 'entregada' and orden.estado != 'cancelada' %}
+        {% if orden.estado != 'pagada' and orden.estado != 'cancelada' %}
         <div class="card">
             <div class="card-header"><i class="fas fa-plus-circle"></i> Agregar Producto</div>
             <div class="card-body">
@@ -123,5 +130,27 @@
         </div>
         {% endif %}
     </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectEstado = document.querySelector("select[name='estado']");
+        const contenedorPago = document.getElementById("contenedor-metodo-pago");
+
+        function togglePago() {
+            if (selectEstado.value === "pagada") {
+                contenedorPago.style.display = "block";
+            } else {
+                contenedorPago.style.display = "none";
+            }
+        }
+
+        // Ejecutar en la carga inicial
+        togglePago();
+
+        // Ejecutar cada vez que el usuario cambie el estado
+        selectEstado.addEventListener("change", togglePago);
+    });
+</script>
 {% endblock %}

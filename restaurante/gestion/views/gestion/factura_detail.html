@@ -1,38 +1,130 @@
 {% extends "gestion/base.html" %}
 {% block title %}Factura {{ factura.numero_factura }} - RestaurantPro{% endblock %}
 {% block content %}
+
 <div class="page-header no-print">
     <h1><span class="icon"><i class="fas fa-file-invoice-dollar"></i></span> {{ factura.numero_factura }}</h1>
     <div>
-        <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-print"></i> Imprimir</button>
-        <a href="{% url 'factura_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Imprimir
+        </button>
+        <a href="{% url 'factura_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
     </div>
 </div>
 
 <div class="factura-print">
-    <div style="text-align: center; margin-bottom: 30px;">
+
+    <!-- ================================================================
+         ENCABEZADO LEGAL — datos del emisor exigidos por la DIAN
+    ================================================================ -->
+    {% if factura.sucursal %}
+    <div
+        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid #333;">
+
+        <!-- Logo (si existe) -->
+        <div style="flex: 0 0 auto; margin-right: 20px;">
+            {% if factura.sucursal.empresa.logo_url %}
+            <img src="{{ factura.sucursal.empresa.logo_url }}" alt="Logo"
+                style="max-height: 80px; max-width: 150px; object-fit: contain;">
+            {% else %}
+            <div style="width: 80px; height: 80px; background: #f0f0f0; border-radius: 8px;
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 2rem; color: #ccc;">
+                <i class="fas fa-utensils"></i>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Datos del emisor -->
+        <div style="flex: 1;">
+            <h2 style="margin: 0 0 4px; font-size: 1.3rem;">
+                {{ factura.sucursal.empresa.razon_social }}
+            </h2>
+            {% if factura.sucursal.empresa.nombre_comercial %}
+            <p style="margin: 0 0 4px; color: #555; font-style: italic;">
+                {{ factura.sucursal.empresa.nombre_comercial }}
+            </p>
+            {% endif %}
+            <p style="margin: 0 0 2px;"><strong>NIT:</strong> {{ factura.sucursal.empresa.nit }}</p>
+            <p style="margin: 0 0 2px;">
+                <strong>Régimen:</strong>
+                {{ factura.sucursal.empresa.get_regimen_display }}
+            </p>
+            <p style="margin: 0 0 2px;">
+                <strong>Impuesto:</strong>
+                {{ factura.sucursal.empresa.tipo_impuesto }}
+                {{ factura.sucursal.empresa.porcentaje_impuesto }}%
+            </p>
+        </div>
+
+        <!-- Datos de la sucursal emisora -->
+        <div style="flex: 0 0 200px; text-align: right;">
+            <p style="margin: 0 0 2px; font-weight: 600;">
+                {{ factura.sucursal.nombre }}
+            </p>
+            <p style="margin: 0 0 2px; font-size: 0.9rem; color: #555;">
+                {{ factura.sucursal.direccion }}
+            </p>
+            {% if factura.sucursal.telefono %}
+            <p style="margin: 0; font-size: 0.9rem; color: #555;">
+                Tel: {{ factura.sucursal.telefono }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <!-- Encabezado de respaldo si la factura no tiene sucursal (registros históricos) -->
+    <div style="text-align: center; margin-bottom: 24px;">
         <h2 style="margin-bottom: 4px;">RestaurantPro</h2>
-        <p style="color: #666;">Sistema de Gestion de Restaurante</p>
+        <p style="color: #666;">Sistema de Gestión de Restaurante</p>
         <hr style="margin: 16px 0; border-color: #eee;">
     </div>
+    {% endif %}
+    <!-- ============================================================== -->
 
+    <!-- Datos de la factura y del cliente -->
     <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
         <div>
             <h3 style="margin-bottom: 8px;">Factura</h3>
             <p><strong>No:</strong> {{ factura.numero_factura }}</p>
             <p><strong>Fecha:</strong> {{ factura.fecha|date:"d/m/Y H:i" }}</p>
             <p><strong>Orden:</strong> #{{ factura.orden.id }}</p>
+            <p>
+                <strong>Método de pago:</strong>
+                {% if factura.metodo_pago == 'efectivo' %}
+                <span style="padding:2px 8px; border-radius:10px; font-size:0.85rem;
+                                 background:#e8f5e9; color:#2e7d32;">
+                    <i class="fas fa-money-bill-wave"></i> Efectivo
+                </span>
+                {% elif factura.metodo_pago == 'tarjeta' %}
+                <span style="padding:2px 8px; border-radius:10px; font-size:0.85rem;
+                                 background:#e3f2fd; color:#1565c0;">
+                    <i class="fas fa-credit-card"></i> Tarjeta
+                </span>
+                {% else %}
+                <span style="padding:2px 8px; border-radius:10px; font-size:0.85rem;
+                                 background:#fff3e0; color:#e65100;">
+                    <i class="fas fa-exchange-alt"></i> Transferencia
+                </span>
+                {% endif %}
+            </p>
         </div>
         <div style="text-align: right;">
             <h3 style="margin-bottom: 8px;">Cliente</h3>
             <p>{{ factura.cliente.nombre }}</p>
+            <p>{{ factura.cliente.get_tipo_documento_display }}: {{ factura.cliente.numero_documento }}</p>
             <p>{{ factura.cliente.telefono|default:"" }}</p>
             <p>{{ factura.cliente.email|default:"" }}</p>
         </div>
     </div>
 
-    <p style="margin-bottom: 8px;"><strong>Atendido por:</strong> {{ factura.empleado.nombre }}</p>
+    <p style="margin-bottom: 16px;">
+        <strong>Atendido por:</strong> {{ factura.empleado.nombre }} {{ factura.empleado.apellido }}
+    </p>
 
+    <!-- Tabla de productos -->
     <table style="margin-top: 16px;">
         <thead>
             <tr>
@@ -54,15 +146,36 @@
         </tbody>
     </table>
 
+    <!-- Totales -->
     <div style="text-align: right; margin-top: 24px; padding-top: 16px; border-top: 2px solid #333;">
-        <p style="font-size: 1rem;"><strong>Subtotal:</strong> ${{ factura.subtotal }}</p>
-        <p style="font-size: 1rem;"><strong>Impuesto:</strong> ${{ factura.impuesto }}</p>
-        <p style="font-size: 1.4rem; color: #2e7d32; margin-top: 8px;"><strong>TOTAL: ${{ factura.total }}</strong></p>
+        <p style="font-size: 1rem;">
+            <strong>Subtotal:</strong> ${{ factura.subtotal }}
+        </p>
+        <p style="font-size: 1rem;">
+            <strong>
+                {% if factura.sucursal %}
+                {{ factura.sucursal.empresa.tipo_impuesto }}
+                ({{ factura.sucursal.empresa.porcentaje_impuesto }}%):
+                {% else %}
+                Impuesto:
+                {% endif %}
+            </strong>
+            ${{ factura.impuesto }}
+        </p>
+        <p style="font-size: 1.4rem; color: #2e7d32; margin-top: 8px;">
+            <strong>TOTAL: ${{ factura.total }}</strong>
+        </p>
     </div>
 
+    <!-- Pie de factura -->
     <div style="text-align: center; margin-top: 40px; color: #999; font-size: 0.85rem;">
         <p>Gracias por su visita</p>
-        <p>RestaurantPro - Sistema de Gestion</p>
+        {% if factura.sucursal %}
+        <p>{{ factura.sucursal.empresa.razon_social }} — {{ factura.sucursal.nombre }}</p>
+        {% else %}
+        <p>RestaurantPro — Sistema de Gestión</p>
+        {% endif %}
     </div>
+
 </div>
 {% endblock %}

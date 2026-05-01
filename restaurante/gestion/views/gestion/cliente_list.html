@@ -5,11 +5,21 @@
     <h1><span class="icon"><i class="fas fa-user-tie"></i></span> Clientes</h1>
     <a href="{% url 'cliente_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo Cliente</a>
 </div>
+
+<form method="get" style="margin-bottom:1rem; display:flex; gap:.5rem; align-items:center;">
+    <input type="text" name="nombre" value="{{ nombre_actual }}" placeholder="Buscar por nombre…" class="form-control"
+        style="width:280px;">
+    <button type="submit" class="btn btn-secondary"><i class="fas fa-search"></i> Buscar</button>
+    {% if nombre_actual %}
+    <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary">✕ Limpiar</a>
+    {% endif %}
+</form>
+
 <div class="table-container">
     <table class="table">
         <thead>
             <tr>
-                <th>Cédula</th>
+                <th>Documento</th>
                 <th>Nombre</th>
                 <th>Telefono</th>
                 <th>Email</th>
@@ -20,7 +30,7 @@
         <tbody>
             {% for c in clientes %}
             <tr>
-                <td>{{ c.cedula }}</td>
+                <td>{{ c.get_tipo_documento_display }}: {{ c.numero_documento }}</td>
                 <td>{{ c.nombre }}</td>
                 <td>{{ c.telefono|default:"-" }}</td>
                 <td>{{ c.email|default:"-" }}</td>

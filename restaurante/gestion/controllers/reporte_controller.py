@@ -1,8 +1,10 @@
 from django.shortcuts import render
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Avg
+from gestion.helpers.decorators import admin_required
 from django.utils import timezone
 from gestion.models import Orden, DetalleOrden
 
+@admin_required(login_url='/login/')
 def reporte_ventas(request):
     hoy = timezone.now().date()
     anio = hoy.year
@@ -32,7 +34,7 @@ def reporte_ventas(request):
         ordenes = Orden.objects.filter(
             fecha__gte=inicio_dt,
             fecha__lte=fin_dt,
-            estado='entregada'
+            estado='pagada'
         )
         total_ventas = ordenes.aggregate(total=Sum('total'))['total'] or 0
         total_ordenes = ordenes.count()
@@ -57,3 +59,16 @@ def reporte_ventas(request):
         'semestre_anterior': get_stats(inicio_anterior, fin_anterior),
     }
     return render(request, 'gestion/reporte_de_ventas.html', context)
+
+
+@admin_required(login_url='/login/')
+def reporte_meseros(request):
+    reporte = Orden.objects.filter(estado='pagada') \
+        .values('mesero__nombre', 'mesero__apellido') \
+        .annotate(
+            total_ordenes=Count('id'),
+            total_vendido=Sum('total'),
+            promedio_orden=Avg('total')
+        ).order_by('-total_vendido')
+
+    return render(request, 'gestion/reporte_rendimiento_mesero.html', {'reporte': reporte})

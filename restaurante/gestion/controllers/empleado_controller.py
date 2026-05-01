@@ -7,10 +7,33 @@ from gestion.helpers.decorators import admin_required
 
 from django.contrib.auth.models import User
 
+from django.db.models import Q
+
 @admin_required(login_url='dashboard')
 def empleado_list(request):
     empleados = Empleado.objects.all()
-    return render(request, 'gestion/empleado_list.html', {'empleados': empleados})
+
+    q      = request.GET.get('q', '').strip()
+    puesto = request.GET.get('puesto', '').strip()
+    activo = request.GET.get('activo', '').strip()
+
+    if q:
+        empleados = empleados.filter(
+            Q(nombre__icontains=q) | Q(apellido__icontains=q)
+        )
+    if puesto:
+        empleados = empleados.filter(puesto=puesto)
+    if activo in ('0', '1'):
+        empleados = empleados.filter(activo=(activo == '1'))
+
+    context = {
+        'empleados':    empleados,
+        'filtro_q':     q,
+        'filtro_puesto': puesto,
+        'filtro_activo': activo,
+        'puestos':      Empleado.PUESTOS,
+    }
+    return render(request, 'gestion/empleado_list.html', context)
 
 
 @admin_required(login_url='dashboard')
@@ -19,13 +42,13 @@ def empleado_create(request):
         form = EmpleadoForm(request.POST)
         if form.is_valid():
             empleado = form.save(commit=False)
-            user, created = User.objects.get_or_create(username=empleado.cedula)
+            user, created = User.objects.get_or_create(username=empleado.numero_documento)
             if created:
-                user.set_password(empleado.cedula)
+                user.set_password(empleado.numero_documento)
                 user.save()
             empleado.usuario = user
             empleado.save()
-            messages.success(request, 'Empleado registrado exitosamente. Su usuario y contraseña son su número de cédula.')
+            messages.success(request, 'Empleado registrado exitosamente. Su usuario y contraseña son su número de documento.')
             return redirect('empleado_list')
     else:
         form = EmpleadoForm()

@@ -5,6 +5,20 @@
     <h1><span class="icon"><i class="fas fa-boxes-stacked"></i></span> Inventario de Productos</h1>
     <a href="{% url 'producto_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo Producto</a>
 </div>
+
+<form method="get" style="margin-bottom:1rem; display:flex; gap:.5rem; align-items:center;">
+    <select name="categoria" class="form-control" style="width:auto;">
+        <option value="">— Todas las categorías —</option>
+        {% for cat in categorias %}
+            <option value="{{ cat.id }}" {% if categoria_actual == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.nombre }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-secondary"><i class="fas fa-filter"></i> Filtrar</button>
+    {% if categoria_actual %}
+        <a href="{% url 'producto_list' %}" class="btn btn-outline-secondary">✕ Limpiar</a>
+    {% endif %}
+</form>
+
 <div class="table-container">
     <table class="table">
         <thead>

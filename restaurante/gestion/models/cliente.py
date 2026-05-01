@@ -3,20 +3,33 @@ from django.core.validators import RegexValidator
 
 
 class Cliente(models.Model):
-    cedula = models.CharField(
-        max_length=20, 
-        unique=True, 
-        default="0",
-        validators=[
-            RegexValidator(
-                regex=r'^[1-9]\d*$',
-                message='La cédula solo puede contener números y no puede empezar en cero.'
-            )
-        ]
+
+    TIPO_DOCUMENTO_CHOICES = [
+        ('CC',  'Cédula de Ciudadanía'),
+        ('PPT', 'Permiso de Protección Temporal'),
+        ('PEP', 'Permiso Especial de Permanencia'),
+        ('CE',  'Cédula de Extranjería'),
+        ('PA',  'Pasaporte'),
+    ]
+
+    tipo_documento = models.CharField(
+        max_length=5,
+        choices=TIPO_DOCUMENTO_CHOICES,
+        default='CC',
+        verbose_name='Tipo de documento',
     )
+
+    numero_documento = models.CharField(
+        max_length=20,
+        unique=True,
+        verbose_name='Número de documento',
+    )
+
     nombre = models.CharField(max_length=100)
+
     telefono = models.CharField(
-        max_length=10, 
+        max_length=10,
+        blank=False,
         validators=[
             RegexValidator(
                 regex=r'^3\d{9}$',
@@ -24,7 +37,8 @@ class Cliente(models.Model):
             )
         ]
     )
-    email = models.EmailField(blank=True)
+
+    email = models.EmailField(max_length=255, blank=True, null=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -33,4 +47,4 @@ class Cliente(models.Model):
         ordering = ['nombre']
 
     def __str__(self):
-        return f"{self.nombre} (CC: {self.cedula})"
+        return f"{self.nombre} ({self.get_tipo_documento_display()}: {self.numero_documento})"

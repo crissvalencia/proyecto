@@ -24,7 +24,7 @@
     <a href="{% url 'orden_list' %}" style="text-decoration: none; color: inherit; display: block;">
         <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
-            <div class="stat-number">{{ total_ordenes }}</div>
+            <div class="stat-number">{{ ordenes_activas }}</div>
             <div class="stat-label">Ordenes Activas</div>
         </div>
     </a>
@@ -45,14 +45,50 @@
     <a href="{% url 'mesa_list' %}" style="text-decoration: none; color: inherit; display: block;">
         <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
             <div class="stat-icon"><i class="fas fa-chair"></i></div>
-            <div class="stat-number">{{ total_mesas }}</div>
-            <div class="stat-label">Mesas</div>
+            <div class="stat-number">{{ mesas_ocupadas }} / {{ total_mesas }}</div>
+            <div class="stat-label">Mesas Ocupadas</div>
         </div>
     </a>
 </div>
 
-<!-- Ordenes recientes y productos bajo stock -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <a href="{% url 'factura_list' %}" style="text-decoration: none; color: inherit; display: block;">
+        <div class="stat-card" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="stat-icon"><i class="fas fa-cash-register"></i></div>
+            <div class="stat-number">${{ ventas_hoy|floatformat:2 }}</div>
+            <div class="stat-label">Ventas de Hoy</div>
+        </div>
+    </a>
+</div>
+
+<!-- Ordenes recientes, productos bajo stock, y top productos -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px;">
+    
+    <div class="card">
+        <div class="card-header"><i class="fas fa-star" style="color: var(--warning);"></i> Top 5 Productos de Hoy</div>
+        <div class="card-body">
+            {% if productos_mas_vendidos %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th style="text-align: right;">Vendidos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prod in productos_mas_vendidos %}
+                    <tr>
+                        <td>{{ prod.nombre }}</td>
+                        <td style="text-align: right;"><strong style="color: var(--primary);">{{ prod.total_vendido }} unid.</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: var(--text-muted);">No hay ventas registradas el día de hoy.</p>
+            {% endif %}
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header"><i class="fas fa-clock"></i> Ordenes Recientes</div>
         <div class="card-body">
@@ -84,8 +120,7 @@
     </div>
 
     <div class="card">
-        <div class="card-header"><i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> Insumos
-            Bajo Stock</div>
+        <div class="card-header"><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Insumos Bajo Stock</div>
         <div class="card-body">
             {% if insumos_bajo_stock %}
             <table class="table">

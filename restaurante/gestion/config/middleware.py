@@ -12,7 +12,7 @@ class LoginRequiredMiddleware:
             if not request.path.startswith('/admin/'):
                 try:
                     current_route_name = resolve(request.path_info).url_name
-                    if current_route_name not in ['login', 'logout']:
+                    if current_route_name not in ['login', 'logout', 'recuperar_clave']:
                         return redirect(settings.LOGIN_URL)
                 except:
                     pass

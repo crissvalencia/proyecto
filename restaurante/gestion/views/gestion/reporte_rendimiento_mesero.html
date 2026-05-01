@@ -1,0 +1,38 @@
+{% extends "gestion/base.html" %}
+{% load static %}
+{% block title %}Rendimiento por Mesero - RESTCODE{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="icon"><i class="fas fa-user-tie"></i></span> Rendimiento por Mesero</h1>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mesero</th>
+                <th>Órdenes Atendidas</th>
+                <th>Total Vendido</th>
+                <th>Promedio por Orden</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in reporte %}
+            <tr>
+                <td><strong>{{ item.mesero__nombre }} {{ item.mesero__apellido }}</strong></td>
+                <td>{{ item.total_ordenes }}</td>
+                <td>${{ item.total_vendido|floatformat:2 }}</td>
+                <td>${{ item.promedio_orden|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                    <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>No hay datos de rendimiento disponibles en este momento.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

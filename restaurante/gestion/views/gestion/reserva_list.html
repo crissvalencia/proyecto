@@ -5,6 +5,33 @@
     <h1><span class="icon"><i class="fas fa-calendar-check"></i></span> Reservas</h1>
     <a href="{% url 'reserva_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nueva Reserva</a>
 </div>
+
+<div class="card" style="margin-bottom: 20px; padding: 15px;">
+    <form method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <label for="q" style="font-weight: bold; margin-bottom: 5px; display: block;">Cliente</label>
+            <input type="text" name="q" id="q" value="{{ filtro_q }}" class="form-control" placeholder="Buscar cliente...">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <label for="fecha" style="font-weight: bold; margin-bottom: 5px; display: block;">Fecha</label>
+            <input type="date" name="fecha" id="fecha" value="{{ filtro_fecha }}" class="form-control">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <label for="estado" style="font-weight: bold; margin-bottom: 5px; display: block;">Estado</label>
+            <select name="estado" id="estado" class="form-control">
+                <option value="">Todos</option>
+                {% for value, label in estados %}
+                <option value="{{ value }}" {% if value == filtro_estado %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filtrar</button>
+            <a href="{% url 'reserva_list' %}" class="btn btn-secondary"><i class="fas fa-eraser"></i> Limpiar</a>
+        </div>
+    </form>
+</div>
+
 <div class="table-container">
     <table class="table">
         <thead>

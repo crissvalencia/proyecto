@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - RestaurantProMax</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f4f7f6; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .login-container { 
+            background: white; 
+            padding: 2.5rem 2rem; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            width: 100%; 
+            max-width: 400px; 
+        }
+        .login-header { 
+            text-align: center; 
+            margin-bottom: 2rem; 
+        }
+        .login-header h2 {
+            margin: 0 0 0.5rem 0;
+            color: #2c3e50;
+        }
+        .login-header p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .btn-primary { 
+            width: 100%; 
+            padding: 0.8rem; 
+            background-color: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+        input[type="text"], 
+        input[type="password"] { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+            font-family: inherit;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        .alert-error { 
+            background-color: #fcf1f1; 
+            color: #d93025; 
+            padding: 0.8rem; 
+            border-radius: 4px; 
+            border: 1px solid #f9d3d3; 
+            margin-bottom: 1.5rem; 
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .errorlist { 
+            list-style-type: none; 
+            padding-left: 0; 
+            margin: 0; 
+            color: #d93025;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        .text-center { text-align: center; }
+        .mt-3 { margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2><i class="fas fa-lock-open" style="color: #4CAF50;"></i> Restablecer Clave</h2>
+            <p>Ingresa tu usuario y cédula para cambiar la contraseña al instante.</p>
+        </div>
+        
+        {% if form.non_field_errors %}
+        <div class="alert-error">
+            {{ form.non_field_errors.0 }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                {{ field }}
+                {% if field.errors %}
+                {{ field.errors }}
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn-primary">Guardar Nueva Clave</button>
+            <div class="text-center mt-3">
+                <a href="{% url 'login' %}" style="color: #7f8c8d; text-decoration: none; font-size: 0.9rem;">
+                    <i class="fas fa-arrow-left"></i> Cancelar y Volver
+                </a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

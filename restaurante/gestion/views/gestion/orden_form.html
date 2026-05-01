@@ -34,11 +34,14 @@
                     <select id="producto-select" class="form-select" style="flex: 2;">
                         <option value="">-- Seleccionar Producto --</option>
                         {% for p in productos %}
-                        <option value="{{ p.id }}" data-nombre="{{ p.nombre }}" data-precio="{{ p.precio }}">{{ p.nombre }} - ${{ p.precio }}</option>
+                        <option value="{{ p.id }}" data-nombre="{{ p.nombre }}" data-precio="{{ p.precio }}">{{ p.nombre
+                            }} - ${{ p.precio }}</option>
                         {% endfor %}
                     </select>
-                    <input type="number" id="producto-cantidad" class="form-control" placeholder="Cant." min="1" value="1" style="flex: 1;">
-                    <button type="button" class="btn btn-primary" onclick="agregarProductoList()"><i class="fas fa-plus"></i></button>
+                    <input type="number" id="producto-cantidad" class="form-control" placeholder="Cant." min="1"
+                        value="1" style="flex: 1;">
+                    <button type="button" class="btn btn-primary" onclick="agregarProductoList()"><i
+                            class="fas fa-plus"></i></button>
                 </div>
 
                 <table class="table" id="productos-table">
@@ -52,7 +55,8 @@
                     </thead>
                     <tbody>
                         <tr id="empty-row">
-                            <td colspan="4" style="text-align:center; color: var(--text-muted);">No hay productos agregados todavía.</td>
+                            <td colspan="4" style="text-align:center; color: var(--text-muted);">No hay productos
+                                agregados todavía.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -60,8 +64,52 @@
         </div>
     </div>
 
+    <!-- MÉTODO DE PAGO -->
+    <div class="card" style="margin-top: 24px;">
+        <div class="card-header"><i class="fas fa-credit-card"></i> Método de Pago</div>
+        <div class="card-body"
+            style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start;">
+
+            <!-- Selector de método -->
+            <div class="form-group">
+                <label class="form-label">Método de pago</label>
+                <select name="metodo_pago" id="metodo_pago" class="form-select" onchange="toggleCamposPago()">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="transferencia">Transferencia</option>
+                </select>
+            </div>
+
+            <!-- Monto recibido (efectivo) -->
+            <div class="form-group" id="campo_monto_recibido">
+                <label class="form-label">Monto recibido</label>
+                <input type="number" name="monto_recibido" id="monto_recibido" class="form-control" placeholder="0.00"
+                    min="0" step="0.01">
+                <small style="color: var(--text-muted);">Dinero entregado por el cliente</small>
+            </div>
+
+            <!-- Número de aprobación (tarjeta) -->
+            <div class="form-group" id="campo_numero_aprobacion" style="display:none;">
+                <label class="form-label">N° de aprobación (datáfono)</label>
+                <input type="text" name="numero_aprobacion" id="numero_aprobacion" class="form-control"
+                    placeholder="Ej. 123456">
+                <small style="color: var(--text-muted);">Número del voucher de la tarjeta</small>
+            </div>
+
+            <!-- Número de referencia (transferencia) -->
+            <div class="form-group" id="campo_numero_transferencia" style="display:none;">
+                <label class="form-label">N° de referencia (transferencia)</label>
+                <input type="text" name="numero_transferencia" id="numero_transferencia" class="form-control"
+                    placeholder="Ej. TRF-789012">
+                <small style="color: var(--text-muted);">Número de confirmación de la transferencia</small>
+            </div>
+
+        </div>
+    </div>
+
     <div style="margin-top: 24px; text-align: right;">
-        <button type="button" class="btn btn-success" onclick="submitPedido()"><i class="fas fa-save"></i> Crear Pedido Completo</button>
+        <button type="button" class="btn btn-success" onclick="submitPedido()"><i class="fas fa-save"></i> Crear Pedido
+            Completo</button>
         <a href="{% url 'orden_list' %}" class="btn btn-secondary">Cancelar</a>
     </div>
 </form>
@@ -84,7 +132,7 @@
     function agregarProductoList() {
         const select = document.getElementById('producto-select');
         const cantidadInput = document.getElementById('producto-cantidad');
-        
+
         const id = select.value;
         const cantidad = parseInt(cantidadInput.value);
 
@@ -98,7 +146,6 @@
         const precio = parseFloat(option.getAttribute('data-precio'));
         const subtotal = precio * cantidad;
 
-        // Check if already in list
         const existingIndex = productosPedido.findIndex(p => p.id === id);
         if (existingIndex >= 0) {
             productosPedido[existingIndex].cantidad += cantidad;
@@ -108,8 +155,7 @@
         }
 
         renderTabla();
-        
-        // Reset inputs
+
         select.value = '';
         cantidadInput.value = 1;
     }
@@ -140,11 +186,42 @@
         });
     }
 
+    function toggleCamposPago() {
+        const metodo = document.getElementById('metodo_pago').value;
+        document.getElementById('campo_monto_recibido').style.display = (metodo === 'efectivo') ? 'block' : 'none';
+        document.getElementById('campo_numero_aprobacion').style.display = (metodo === 'tarjeta') ? 'block' : 'none';
+        document.getElementById('campo_numero_transferencia').style.display = (metodo === 'transferencia') ? 'block' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', toggleCamposPago);
+
     function submitPedido() {
         if (productosPedido.length === 0) {
             mostrarAlerta('Debe agregar al menos un producto al pedido.', 'danger');
             return;
         }
+
+        const metodo = document.getElementById('metodo_pago').value;
+        if (metodo === 'efectivo') {
+            const monto = document.getElementById('monto_recibido').value;
+            if (!monto || parseFloat(monto) <= 0) {
+                mostrarAlerta('Ingresa el monto recibido para pago en efectivo.', 'warning');
+                return;
+            }
+        } else if (metodo === 'tarjeta') {
+            const aprobacion = document.getElementById('numero_aprobacion').value.trim();
+            if (!aprobacion) {
+                mostrarAlerta('Ingresa el número de aprobación del datáfono.', 'warning');
+                return;
+            }
+        } else if (metodo === 'transferencia') {
+            const referencia = document.getElementById('numero_transferencia').value.trim();
+            if (!referencia) {
+                mostrarAlerta('Ingresa el número de referencia de la transferencia.', 'warning');
+                return;
+            }
+        }
+
         document.getElementById('productos_json').value = JSON.stringify(productosPedido);
         document.getElementById('pedido-form').submit();
     }

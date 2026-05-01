@@ -1,26 +1,48 @@
 from django.db import models
 from django.core.validators import MinValueValidator, RegexValidator
 from django.contrib.auth.models import User
-
+from .sucursal import Sucursal
 
 class Empleado(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='empleado')
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='empleado')
     PUESTOS = [
         ('mesero', 'Mesero'),
         ('cajero', 'Cajero'),
         ('administrador', 'Administrador'),
     ]
-    cedula = models.CharField(
-        max_length=20, 
-        unique=True,
-        validators=[
-            RegexValidator(
-                regex=r'^[1-9]\d*$',
-                message='La cédula solo puede contener números y no puede empezar en cero.'
-            )
-        ]
+    
+    # NUEVO: sucursal donde trabaja el empleado
+    sucursal = models.ForeignKey(
+        'Sucursal',
+        on_delete=models.SET_NULL,
+        related_name='empleados',
+        null=True,
+        blank=True,
+        verbose_name='Sucursal',
     )
-    nombre = models.CharField(max_length=100)
+
+    TIPO_DOCUMENTO_CHOICES = [
+        ('CC',  'Cédula de Ciudadanía'),
+        ('PPT', 'Permiso de Protección Temporal'),
+        ('PEP', 'Permiso Especial de Permanencia'),
+        ('CE',  'Cédula de Extranjería'),
+        ('PA',  'Pasaporte'),
+    ]
+
+    tipo_documento = models.CharField(
+        max_length=5,
+        choices=TIPO_DOCUMENTO_CHOICES,
+        default='CC',
+        verbose_name='Tipo de documento',
+    )
+
+    numero_documento = models.CharField(
+        max_length=20,
+        unique=True,
+        verbose_name='Número de documento',
+    )
+    nombre = models.CharField(max_length=100, verbose_name='Nombres')
+    apellido = models.CharField(max_length=100, verbose_name='Apellidos')
     puesto = models.CharField(max_length=50, choices=PUESTOS)
     telefono = models.CharField(
         max_length=10, 
@@ -42,4 +64,4 @@ class Empleado(models.Model):
         ordering = ['nombre']
 
     def __str__(self):
-        return f"{self.nombre} (CC: {self.cedula}) - {self.get_puesto_display()}"
+        return f"{self.nombre} {self.apellido} ({self.get_tipo_documento_display()}: {self.numero_documento}) - {self.get_puesto_display()}"

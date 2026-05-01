@@ -7,8 +7,10 @@ from .reserva_controller import reserva_list, reserva_create, reserva_update, re
 from .orden_controller import orden_list, orden_create, orden_detail, orden_agregar_detalle, orden_cambiar_estado, orden_delete
 from .factura_controller import factura_list, factura_detail, generar_factura_auto
 from .insumo_controller import insumo_list, insumo_create, insumo_update, insumo_delete
-from .reporte_controller import reporte_ventas
+from .reporte_controller import reporte_ventas, reporte_meseros
+from .receta_controller import receta_list, receta_create, receta_update, receta_delete
 from .auth_controller import crear_usuario_view, usuario_list_view
+from .empresa_controller import empresa_list, empresa_create, empresa_update, empresa_delete, sucursal_list, sucursal_create, sucursal_update, sucursal_delete
 
 __all__ = [
     'dashboard',
@@ -21,5 +23,9 @@ __all__ = [
     'orden_list', 'orden_create', 'orden_detail', 'orden_agregar_detalle', 'orden_cambiar_estado', 'orden_delete',
     'factura_list', 'factura_detail', 'generar_factura_auto',
     'insumo_list', 'insumo_create', 'insumo_update', 'insumo_delete',
-    'reporte_ventas', 'crear_usuario_view', 'usuario_list_view',
+    'reporte_ventas', 'reporte_meseros',
+    'receta_list', 'receta_create', 'receta_update', 'receta_delete',
+    'crear_usuario_view', 'usuario_list_view',
+    'empresa_list', 'empresa_create', 'empresa_update', 'empresa_delete',
+    'sucursal_list', 'sucursal_create', 'sucursal_update', 'sucursal_delete',
 ]
